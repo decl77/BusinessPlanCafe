@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Break-Even Analysis</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;800&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #ffffff;
+      --line: #E3E0DA;
+      --head: #fafafa;
+      --zebra: #fcfcfc;
+      --muted: #5C5C5C;
+      --text: #000000;
+      --accent: #E86D59;
+      --details-bg: #fafafa;
+      --details-line: #E3E0DA;
+      --summary-text: #000000;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 22px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Jost', sans-serif;
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; }
+
+    h1 {
+      font-family: 'Jost', sans-serif;
+      font-weight: 800;
+      font-size: 40px;
+      margin: .2rem 0;
+    }
+
+    .subtitle {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-weight: 400;
+      color: var(--muted);
+      margin: 0 0 24px;
+    }
+
+    h2 {
+      font-family: 'Jost', sans-serif;
+      font-weight: 800;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 8px;
+      margin-top: 2rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 22px;
+    }
+
+    /* KPIs */
+    .kpis {
+        display: flex;
+        gap: 14px;
+        flex-wrap: nowrap;
+    }
+    .kpi {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      text-align: left;
+      background: #fff;
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    .kpi h3 {
+      margin: 0;
+      font-weight: 400;
+      font-size: 0.8rem;
+      letter-spacing: .08em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .kpi .big {
+      margin: 6px 0;
+      font-weight: 800;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .kpi small {
+      display: block;
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* Tabs & IO Buttons */
+    .tabs-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin: 20px 0 14px;
+    }
+    .tabs {
+        display: flex;
+        gap: 20px;
+        border-bottom: 1px solid var(--line);
+        flex-grow: 1;
+    }
+    .tab {
+      appearance: none;
+      border: none;
+      background: transparent;
+      padding: 9px 4px;
+      font-weight: 400;
+      cursor: pointer;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      margin-bottom: -1px;
+    }
+    .tab.active {
+      color: var(--text);
+      font-weight: 800;
+      border-color: var(--accent);
+    }
+    .io-buttons {
+        display: flex;
+        gap: 10px;
+        padding-left: 10px;
+    }
+    .io-button {
+        appearance: none;
+        background: transparent;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        padding: 8px 12px;
+        font-family: 'Jost', sans-serif;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: background-color 0.2s, color 0.2s;
+        color: var(--muted);
+    }
+    .io-button:hover {
+        background-color: var(--details-bg);
+        color: var(--text);
+    }
+
+    .tabpanel { display: none; }
+    .tabpanel[data-active="true"] { display: block; }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+      margin-top: 1rem;
+    }
+    thead th {
+      background: none;
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 800;
+      border-bottom: 2px solid var(--text);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+    thead th.num { text-align: right; }
+    tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: middle;
+    }
+    tbody td.num { text-align: right; white-space: nowrap; }
+    tfoot td {
+      padding: 12px 14px;
+      border-top: 2px solid var(--text);
+      background: none;
+      font-weight: 800;
+    }
+    tfoot td.num { text-align: right; }
+    tbody tr:nth-child(even) td { background: var(--zebra); }
+    .card table { border: none; border-radius: 0; }
+
+    /* Inputs */
+    input[type="number"] {
+      width: 100%;
+      max-width: 150px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      background: #fff;
+      text-align: right;
+      font-family: 'Jost', sans-serif;
+      font-size: .95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="number"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(232, 109, 89, 0.2);
+    }
+
+    /* Accordions */
+    tr.summary { cursor: pointer; }
+    td.caret { position: relative; padding-left: 26px; }
+    td.caret::before {
+      content: ""; position: absolute; left: 8px; top: 50%; width: 10px; height: 10px;
+      transform: translateY(-50%) rotate(0deg); transition: transform .2s ease;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5l2-2 9 9-9 9-2-2 7-7z" fill="%235C5C5C"/></svg>');
+      background-size: contain; background-repeat: no-repeat; background-position: center;
+    }
+    tr.summary[aria-expanded="true"] td.caret::before { transform: translateY(-50%) rotate(90deg); }
+    tr.details > td { padding: 0; border-top: 0; }
+    .details-box {
+      padding: 16px;
+      border-top: 1px dashed var(--details-line);
+      background: var(--details-bg);
+    }
+    .details-box .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+
+    .details-box label {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 0.9rem;
+    }
+    .details-box label input[type="number"] {
+        max-width: none;
+        width: 100%;
+    }
+
+    /* Sticky Summary */
+    .sticky-summary {
+      position: fixed; top: 0; left: 0; width: 100%; background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(8px);
+      padding: 10px 22px; border-bottom: 1px solid var(--line); z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); display: none;
+    }
+    .sticky-summary.visible { display: block; }
+    .sticky-summary .kpis { gap: 10px; }
+    .sticky-summary .kpi { padding: 8px; background: transparent; border: none; text-align: left; }
+    .sticky-summary .kpi .label-and-value { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
+    .sticky-summary .kpi .label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; }
+    .sticky-summary .kpi .value { font-size: 1.1rem; font-weight: 800; color: var(--summary-text); }
+    .sticky-summary .kpi h3, .sticky-summary .kpi small { display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="sticky-summary">
+    <div class="container">
+      <div class="kpis">
+        <div class="kpi">
+          <div class="label-and-value">
+            <span class="label">TOTAL COSTS</span>
+            <span class="value" id="sticky-costs">€0,00</span>
+          </div>
+        </div>
+        <div class="kpi">
+          <div class="label-and-value">
+            <span class="label">TOTAL REVENUE</span>
+            <span class="value" id="sticky-rev">€0,00</span>
+          </div>
+        </div>
+        <div class="kpi">
+          <div class="label-and-value">
+            <span class="label">PROFIT/LOSS</span>
+            <span class="value" id="sticky-profit">€0,00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1>Break-Even Analysis</h1>
+    <p class="subtitle">Business Plan: Forest Café</p>
+
+    <div class="card" id="summary-section">
+      <div class="kpis">
+        <div class="kpi">
+          <h3>TOTAL COSTS</h3>
+          <div class="big">M: <span id="sum-costs-m"></span></div>
+          <small>A: <span id="sum-costs-ann"></span></small>
+        </div>
+        <div class="kpi">
+          <h3>TOTAL REVENUE</h3>
+          <div class="big">M: <span id="sum-rev-m"></span></div>
+          <small>A: <span id="sum-rev-ann"></span></small>
+        </div>
+        <div class="kpi">
+          <h3>PROFIT/LOSS</h3>
+          <div class="big">M: <span id="sum-profit-m"></span></div>
+          <small>A: <span id="sum-profit-ann"></span></small>
+        </div>
+      </div>
+    </div>
+
+    <div class="tabs-wrapper">
+        <div class="tabs">
+            <button id="tab-costs-btn" class="tab active" aria-selected="true">Recurring Costs</button>
+            <button id="tab-rev-btn" class="tab" aria-selected="false">Estimated Revenue</button>
+        </div>
+        <div class="io-buttons">
+            <button class="io-button" id="export-btn">Export CSV</button>
+            <button class="io-button" id="import-btn">Import CSV</button>
+            <input type="file" id="csv-import-input" accept=".csv" style="display:none;">
+        </div>
+    </div>
+
+    <div id="tab-costs" class="tabpanel card" data-active="true">
+      <h2>Personnel Costs</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Position</th>
+            <th class="num">Monthly Salary</th>
+            <th class="num">High Season</th>
+            <th class="num">Winter Season</th>
+          </tr>
+        </thead>
+        <tbody id="staff-body"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">Total (monthly)</td>
+            <td class="num" id="staff-hs-month">€0,00</td>
+            <td class="num" id="staff-ws-month">€0,00</td>
+          </tr>
+          <tr>
+            <td colspan="2">Total (annually)</td>
+            <td class="num" id="staff-hs-annual">€0,00</td>
+            <td class="num" id="staff-ws-annual">€0,00</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <h2>Goods</h2>
+      <table>
+        <thead><tr><th>Item</th><th class="num">Monthly</th></tr></thead>
+        <tbody id="goods-body"></tbody>
+        <tfoot>
+          <tr><td>Total (monthly)</td><td class="num" id="goods-month">€0,00</td></tr>
+          <tr><td>Total (annually)</td><td class="num" id="goods-annual">€0,00</td></tr>
+        </tfoot>
+      </table>
+
+      <h2>Operating Costs</h2>
+      <table>
+        <thead><tr><th>Category</th><th class="num">Monthly</th></tr></thead>
+        <tbody id="op-body"></tbody>
+        <tfoot>
+          <tr><td>Total (monthly)</td><td class="num" id="op-month">€0,00</td></tr>
+          <tr><td>Total (annually)</td><td class="num" id="op-annual">€0,00</td></tr>
+        </tfoot>
+      </table>
+    </div>
+    <div id="tab-rev" class="tabpanel card" data-active="false">
+      <h2>Daily Operation — Café</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Factor</th>
+            <th class="num">High Season</th>
+            <th class="num">Winter Season</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Seating Capacity</td>
+            <td class="num"><input type="number" data-daily="high-season-daily" data-field="seatingCapacity"></td>
+            <td class="num"><input type="number" data-daily="winter-season-daily" data-field="seatingCapacity"></td>
+          </tr>
+          <tr>
+            <td>Table Turnover</td>
+            <td class="num"><input type="number" step="0.1" data-daily="high-season-daily" data-field="tableTurnover"></td>
+            <td class="num"><input type="number" step="0.1" data-daily="winter-season-daily" data-field="tableTurnover"></td>
+          </tr>
+          <tr>
+            <td>Occupancy %</td>
+            <td class="num"><input type="number" step="1" data-daily="high-season-daily" data-field="occupancy"></td>
+            <td class="num"><input type="number" step="1" data-daily="winter-season-daily" data-field="occupancy"></td>
+          </tr>
+          <tr>
+            <td>Guests per Day</td>
+            <td class="num" id="guests-high-season-daily">0</td>
+            <td class="num" id="guests-winter-season-daily">0</td>
+          </tr>
+          <tr>
+            <td>Avg Spend per Guest</td>
+            <td class="num"><input type="number" data-daily="high-season-daily" data-field="spend"></td>
+            <td class="num"><input type="number" data-daily="winter-season-daily" data-field="spend"></td>
+          </tr>
+          <tr>
+            <td>Open Days per Month</td>
+            <td class="num"><input type="number" data-daily="high-season-daily" data-field="openDays"></td>
+            <td class="num"><input type="number" data-daily="winter-season-daily" data-field="openDays"></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Total (monthly)</td>
+            <td class="num" id="daily-hs-month">€0,00</td>
+            <td class="num" id="daily-ws-month">€0,00</td>
+          </tr>
+          <tr>
+            <td>Total (annually)</td>
+            <td class="num" id="daily-hs-annual">€0,00</td>
+            <td class="num" id="daily-ws-annual">€0,00</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <h2>Ticketed Events</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th class="num">High Season</th>
+            <th class="num">Winter Season</th>
+          </tr>
+        </thead>
+        <tbody id="ticketed-body"></tbody>
+        <tfoot>
+          <tr>
+            <td>Total (monthly)</td>
+            <td class="num" id="ticketed-hs-month">€0,00</td>
+            <td class="num" id="ticketed-ws-month">€0,00</td>
+          </tr>
+          <tr>
+            <td>Total (annually)</td>
+            <td class="num" id="ticketed-hs-annual">€0,00</td>
+            <td class="num" id="ticketed-ws-annual">€0,00</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <h2>Fixed Price Events</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Event</th>
+            <th class="num">High Season</th>
+            <th class="num">Winter Season</th>
+          </tr>
+        </thead>
+        <tbody id="fixed-body"></tbody>
+        <tfoot>
+          <tr>
+            <td>Total (monthly)</td>
+            <td class="num" id="fixed-hs-month">€0,00</td>
+            <td class="num" id="fixed-ws-month">€0,00</td>
+          </tr>
+          <tr>
+            <td>Total (annually)</td>
+            <td class="num" id="fixed-hs-annual">€0,00</td>
+            <td class="num" id="fixed-ws-annual">€0,00</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // ---------- KONFIGURATION & SKALIERUNG ----------
+    const SCALING_FACTOR = 10.5;
+    const MAX_FONT_SIZE = 32;
+    const MONTHS_HS = 7;
+    const MONTHS_WS = 5;
+
+    function scaleKpiFonts() {
+        const kpiElements = document.querySelectorAll('.kpis .kpi');
+        let minFontSize = 14.4;
+
+        const smallElement = document.querySelector('.kpi small');
+        if (smallElement) {
+            const style = window.getComputedStyle(smallElement, null).getPropertyValue('font-size');
+            minFontSize = parseFloat(style);
+        }
+
+        kpiElements.forEach(kpi => {
+            const valueText = kpi.querySelector('.big, .value');
+            if (valueText) {
+                const kpiWidth = kpi.clientWidth;
+                let newSize = kpiWidth / SCALING_FACTOR;
+                newSize = Math.max(minFontSize, Math.min(newSize, MAX_FONT_SIZE));
+                valueText.style.fontSize = newSize + 'px';
+            }
+        });
+    }
+
+    // ---------- UTILS ----------
+    const fmt = new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" });
+    const $ = (q, root = document) => root.querySelector(q);
+    const $$ = (q, root = document) => Array.from(root.querySelectorAll(q));
+    const numValue = v => {
+        if (typeof v === "number") return v;
+        const s = String(v ?? "").trim().replace(",", ".");
+        const f = parseFloat(s);
+        return Number.isFinite(f) ? f : 0;
+    };
+    function pct(x) {
+        const v = numValue(x);
+        if (!Number.isFinite(v)) return 0;
+        return Math.max(0, Math.min(1, v > 1 ? v / 100 : v));
+    }
+    function formatGuests(x) {
+        const isInt = Math.abs(x - Math.round(x)) < 1e-9;
+        return isInt ? String(Math.round(x)) : x.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    }
+
+    // ---------- DATENOBJEKT ----------
+    const breakevenData = {
+      costs: {
+        personnel: {
+          "exp-barista-40h": { label: "Experienced Barista (Full Time 40h)", salary: 3000, high: 0, winter: 0 },
+          "exp-barista-20h": { label: "Experienced Barista (Part Time 20h)", salary: 1500, high: 1, winter: 1 },
+          "trained-staff-40h": { label: "Trained Staff/Service (Full Time 40h)", salary: 3180, high: 1, winter: 1 },
+          "trained-staff-20h": { label: "Trained Staff/Service (Part Time 20h)", salary: 1590, high: 0, winter: 0 },
+          "untrained-staff-40h": { label: "Untrained Staff (Full Time 40h)", salary: 2500, high: 0, winter: 0 },
+          "untrained-staff-20h": { label: "Untrained Staff (Part Time 20h)", salary: 1250, high: 1, winter: 0 },
+          "mini-jobbers": { label: "Mini-Jobbers", salary: 700, high: 1, winter: 2 }
+        },
+        goods: {
+          "cogs": { label: "Cost of Goods Sold (COGS)", monthly: 2000 },
+          "consumables": { label: "Consumables", monthly: 600 },
+          "cleaning": { label: "Cleaning", monthly: 600 },
+          "other-variable-costs": { label: "Other Variable Costs", monthly: 300 }
+        },
+        operating: {
+          "rent": { label: "Rent", monthly: 1750 },
+          "insurance": { label: "Insurance", monthly: 100 },
+          "utilities": { label: "Utilities (Electricity, Gas, Water)", monthly: 350 },
+          "internet-phone": { label: "Internet/Phone, Software", monthly: 150 },
+          "fees": { label: "Fees (GEMA, card payments)", monthly: 250 },
+          "maintenance": { label: "Maintenance & Repairs", monthly: 150 },
+          "misc-tax": { label: "Miscellaneous (tax advisor, etc.)", monthly: 300 }
+        }
+      },
+      revenue: {
+        daily: {
+          "high-season-daily": { seatingCapacity: 50, tableTurnover: 2.5, occupancy: 70, spend: 10, openDays: 20 },
+          "winter-season-daily": { seatingCapacity: 50, tableTurnover: 1.5, occupancy: 25, spend: 10, openDays: 16 }
+        },
+        ticketed: {
+          "small-concerts": { label: "Small Concerts", entryFee: 15, avgRevenue: 5, guests: 20, high: 1, winter: 2 },
+          "trivia-nights": { label: "Trivia Nights", entryFee: 10, avgRevenue: 10, guests: 20, high: 7, winter: 5 },
+          "poetry-readings": { label: "Poetry Readings", entryFee: 10, avgRevenue: 10, guests: 30, high: 1, winter: 2 },
+          "board-game-nights": { label: "Board Game Nights", entryFee: 5, avgRevenue: 10, guests: 20, high: 7, winter: 5 },
+          "castle-stories": { label: "Castle/Forest Stories", entryFee: 10, avgRevenue: 10, guests: 30, high: 1, winter: 2 }
+        },
+        fixed: {
+          "coffee-classes": { label: "Coffee Brewing Classes", price: 60, high: 1, winter: 2 },
+          "small-weddings": { label: "Small Weddings", price: 3000, high: 1, winter: 0 },
+          "birthday-parties": { label: "Birthday Parties", price: 1500, high: 1, winter: 1 },
+          "company-retreats": { label: "Company Retreats", price: 2500, high: 1, winter: 1 }
+        }
+      }
+    };
+
+    // ---------- DOM-ELEMENTE & SEITENLOGIK ----------
+    const stickySummary = $('.sticky-summary');
+    const stickyCosts = $('#sticky-costs');
+    const stickyRev = $('#sticky-rev');
+    const stickyProfit = $('#sticky-profit');
+
+    function handleScroll() {
+        const summarySection = $('#summary-section');
+        const summaryBottom = summarySection.getBoundingClientRect().bottom;
+        const isNowVisible = summaryBottom <= 0;
+        const wasVisible = stickySummary.classList.contains('visible');
+
+        if (isNowVisible && !wasVisible) {
+            stickySummary.classList.add('visible');
+            scaleKpiFonts(); // Call scale function when it becomes visible
+        } else if (!isNowVisible && wasVisible) {
+            stickySummary.classList.remove('visible');
+        }
+    }
+
+    function setupTabs() {
+        const btnC = $("#tab-costs-btn"), btnR = $("#tab-rev-btn");
+        const paneC = $("#tab-costs"), paneR = $("#tab-rev");
+        const set = (rev) => {
+            btnC.classList.toggle("active", !rev);
+            btnR.classList.toggle("active", rev);
+            btnC.setAttribute("aria-selected", String(!rev));
+            btnR.setAttribute("aria-selected", String(rev));
+            paneC.dataset.active = String(!rev);
+            paneR.dataset.active = String(rev);
+        };
+        btnC.addEventListener("click", () => set(false));
+        btnR.addEventListener("click", () => set(true));
+        set(false);
+    }
+
+    function createAccordionSection(tbody, data, type) {
+        let i = 0;
+        tbody.innerHTML = '';
+        for (const [key, d] of Object.entries(data)) {
+            let hs = 0, ws = 0, detailsHtml = '';
+            if (type === 'ticketed') {
+                const per = numValue(d.entryFee) + numValue(d.avgRevenue);
+                hs = per * numValue(d.guests) * numValue(d.high);
+                ws = per * numValue(d.guests) * numValue(d.winter);
+                detailsHtml = `
+                    <label>Events per Season (High)<input type="number" value="${d.high}" data-t-type="ticketed" data-t-key="${key}" data-t-field="high"></label>
+                    <label>Events per Season (Winter)<input type="number" value="${d.winter}" data-t-type="ticketed" data-t-key="${key}" data-t-field="winter"></label>
+                    <label>Entry Fee<input type="number" value="${d.entryFee}" data-t-type="ticketed" data-t-key="${key}" data-t-field="entryFee"></label>
+                    <label>Avg. Revenue per Guest<input type="number" value="${d.avgRevenue}" data-t-type="ticketed" data-t-key="${key}" data-t-field="avgRevenue"></label>
+                    <label>Guests per Event<input type="number" value="${d.guests}" data-t-type="ticketed" data-t-key="${key}" data-t-field="guests"></label>`;
+            } else if (type === 'fixed') {
+                hs = numValue(d.price) * numValue(d.high);
+                ws = numValue(d.price) * numValue(d.winter);
+                detailsHtml = `
+                    <label>Events per Season (High)<input type="number" value="${d.high}" data-t-type="fixed" data-t-key="${key}" data-t-field="high"></label>
+                    <label>Events per Season (Winter)<input type="number" value="${d.winter}" data-t-type="fixed" data-t-key="${key}" data-t-field="winter"></label>
+                    <label>Price per Event<input type="number" value="${d.price}" data-t-type="fixed" data-t-key="${key}" data-t-field="price"></label>`;
+            }
+
+            const zebra = (i++ % 2) ? ' style="background:var(--zebra)"' : '';
+            tbody.insertAdjacentHTML("beforeend", `
+              <tr class="summary" data-key="${key}" aria-expanded="false"${zebra}>
+                <td class="caret">${d.label}</td>
+                <td class="num" id="${key}-hs">${fmt.format(hs)}</td>
+                <td class="num" id="${key}-ws">${fmt.format(ws)}</td>
+              </tr>
+              <tr class="details" data-key="${key}" hidden>
+                <td colspan="3"><div class="details-box"><div class="grid">${detailsHtml}</div></div></td>
+              </tr>`);
+        }
+    }
+
+    function renderAccordions() {
+        createAccordionSection($("#ticketed-body"), breakevenData.revenue.ticketed, 'ticketed');
+        createAccordionSection($("#fixed-body"), breakevenData.revenue.fixed, 'fixed');
+
+        $$("tr.summary").forEach(tr => {
+            tr.addEventListener("click", () => {
+                const key = tr.dataset.key;
+                const det = document.querySelector(`tr.details[data-key="${key}"]`);
+                const open = det.hasAttribute("hidden");
+                det.toggleAttribute("hidden", !open);
+                tr.setAttribute("aria-expanded", String(open));
+            });
+        });
+        $$(".details input").forEach(inp => {
+            inp.addEventListener("input", () => {
+                const t = inp.dataset.tType, k = inp.dataset.tKey, f = inp.dataset.tField;
+                breakevenData.revenue[t][k][f] = numValue(inp.value);
+                calculateAll();
+            });
+        });
+    }
+
+    function renderFixedTables() {
+      const staffBody = $('#staff-body');
+      staffBody.innerHTML = '';
+      for (const [key, d] of Object.entries(breakevenData.costs.personnel)) {
+        const row = staffBody.insertRow();
+        row.innerHTML = `<td>${d.label}</td>
+                         <td class="num"><input type="number" value="${d.salary}" data-cost-type="personnel" data-cost-item="${key}" data-cost-field="salary"></td>
+                         <td class="num"><input type="number" value="${d.high}" data-cost-type="personnel" data-cost-item="${key}" data-cost-field="high"></td>
+                         <td class="num"><input type="number" value="${d.winter}" data-cost-type="personnel" data-cost-item="${key}" data-cost-field="winter"></td>`;
+      }
+
+      const goodsBody = $('#goods-body');
+      goodsBody.innerHTML = '';
+      for (const [key, d] of Object.entries(breakevenData.costs.goods)) {
+        const row = goodsBody.insertRow();
+        row.innerHTML = `<td>${d.label}</td>
+                         <td class="num"><input type="number" value="${d.monthly}" data-cost-type="goods" data-cost-item="${key}" data-cost-field="monthly"></td>`;
+      }
+
+      const opBody = $('#op-body');
+      opBody.innerHTML = '';
+      for (const [key, d] of Object.entries(breakevenData.costs.operating)) {
+        const row = opBody.insertRow();
+        row.innerHTML = `<td>${d.label}</td>
+                         <td class="num"><input type="number" value="${d.monthly}" data-cost-type="operating" data-cost-item="${key}" data-cost-field="monthly"></td>`;
+      }
+    }
+
+    function setInputValuesFromData() {
+        $$('input[data-daily]').forEach(inp => {
+            const { daily, field } = inp.dataset;
+            if (breakevenData.revenue.daily[daily] && breakevenData.revenue.daily[daily][field] !== undefined) {
+                inp.value = breakevenData.revenue.daily[daily][field];
+            }
+        });
+    }
+
+    function bindInputs() {
+      $$('input[data-cost-type], input[data-daily]').forEach(inp => {
+        inp.addEventListener("input", () => {
+            if (inp.dataset.costType) {
+                const { costType, costItem, costField } = inp.dataset;
+                breakevenData.costs[costType][costItem][costField] = numValue(inp.value);
+            } else if (inp.dataset.daily) {
+                const { daily, field } = inp.dataset;
+                breakevenData.revenue.daily[daily][field] = numValue(inp.value);
+            }
+            calculateAll();
+        });
+      });
+    }
+
+    // ---------- BERECHNUNGEN & DARSTELLUNG ----------
+    function calculateAll() {
+        // Personalkosten
+        let personnelHsA = 0, personnelWsA = 0;
+        for (const d of Object.values(breakevenData.costs.personnel)) {
+            personnelHsA += numValue(d.salary) * numValue(d.high) * MONTHS_HS;
+            personnelWsA += numValue(d.salary) * numValue(d.winter) * MONTHS_WS;
+        }
+        $('#staff-hs-month').textContent = fmt.format(personnelHsA / 12);
+        $('#staff-ws-month').textContent = fmt.format(personnelWsA / 12);
+        $('#staff-hs-annual').textContent = fmt.format(personnelHsA);
+        $('#staff-ws-annual').textContent = fmt.format(personnelWsA);
+        const staffA = personnelHsA + personnelWsA;
+
+        // Waren & Betriebskosten
+        const goodsM = Object.values(breakevenData.costs.goods).reduce((a, i) => a + numValue(i.monthly), 0);
+        const opM = Object.values(breakevenData.costs.operating).reduce((a, i) => a + numValue(i.monthly), 0);
+        $('#goods-month').textContent = fmt.format(goodsM);
+        $('#goods-annual').textContent = fmt.format(goodsM * 12);
+        $('#op-month').textContent = fmt.format(opM);
+        $('#op-annual').textContent = fmt.format(opM * 12);
+
+        // Tagesgeschäft Einnahmen
+        const dailyCalc = (seasonKey) => {
+            const s = breakevenData.revenue.daily[seasonKey];
+            const guests = numValue(s.seatingCapacity) * pct(s.occupancy) * numValue(s.tableTurnover);
+            $(`#guests-${seasonKey}`).textContent = formatGuests(guests);
+            return guests * numValue(s.spend) * numValue(s.openDays);
+        };
+        const dailyHSM = dailyCalc('high-season-daily');
+        const dailyWSM = dailyCalc('winter-season-daily');
+        $('#daily-hs-month').textContent = fmt.format(dailyHSM);
+        $('#daily-ws-month').textContent = fmt.format(dailyWSM);
+        $('#daily-hs-annual').textContent = fmt.format(dailyHSM * MONTHS_HS);
+        $('#daily-ws-annual').textContent = fmt.format(dailyWSM * MONTHS_WS);
+
+        // Event Einnahmen
+        let eventsA = 0;
+        ['ticketed', 'fixed'].forEach(type => {
+            let totalHsA = 0, totalWsA = 0;
+            Object.entries(breakevenData.revenue[type]).forEach(([key, d]) => {
+                const perGuest = type === 'ticketed' ? numValue(d.entryFee) + numValue(d.avgRevenue) : 0;
+                const price = type === 'fixed' ? numValue(d.price) : perGuest * numValue(d.guests);
+                const hsVal = price * numValue(d.high);
+                const wsVal = price * numValue(d.winter);
+                $(`#${key}-hs`).textContent = fmt.format(hsVal);
+                $(`#${key}-ws`).textContent = fmt.format(wsVal);
+                totalHsA += hsVal;
+                totalWsA += wsVal;
+            });
+            $(`#${type}-hs-month`).textContent = fmt.format(totalHsA / 12);
+            $(`#${type}-ws-month`).textContent = fmt.format(totalWsA / 12);
+            $(`#${type}-hs-annual`).textContent = fmt.format(totalHsA);
+            $(`#${type}-ws-annual`).textContent = fmt.format(totalWsA);
+            eventsA += totalHsA + totalWsA;
+        });
+
+        // Gesamtsummen
+        const costsA = staffA + (goodsM * 12) + (opM * 12);
+        const revA = (dailyHSM * MONTHS_HS) + (dailyWSM * MONTHS_WS) + eventsA;
+        const costsM = costsA / 12;
+        const revM = revA / 12;
+        const profitM = revM - costsM;
+        const profitA = revA - costsA;
+
+        // Top Summary Updates
+        $("#sum-costs-m").textContent = fmt.format(costsM);
+        $("#sum-costs-ann").textContent = fmt.format(costsA);
+        $("#sum-rev-m").textContent = fmt.format(revM);
+        $("#sum-rev-ann").textContent = fmt.format(revA);
+        $("#sum-profit-m").textContent = fmt.format(profitM);
+        $("#sum-profit-ann").textContent = fmt.format(profitA);
+
+        // Sticky Header Updates
+        stickyCosts.textContent = fmt.format(costsM);
+        stickyRev.textContent = fmt.format(revM);
+        stickyProfit.textContent = fmt.format(profitM);
+
+        // Farb-Updates für negative Werte
+        const negativeColor = 'var(--accent)';
+        const defaultColorText = 'var(--text)';
+        const defaultColorSummary = 'var(--summary-text)';
+
+        $('#sum-costs-m').parentElement.style.color = negativeColor;
+        $('#sum-costs-ann').parentElement.style.color = negativeColor;
+        $('#sticky-costs').style.color = negativeColor;
+
+        $('#sum-profit-m').parentElement.style.color = profitM < 0 ? negativeColor : defaultColorText;
+        $('#sum-profit-ann').parentElement.style.color = profitA < 0 ? negativeColor : defaultColorText;
+        $('#sticky-profit').style.color = profitM < 0 ? negativeColor : defaultColorSummary;
+
+        scaleKpiFonts();
+    }
+
+    // ---------- CSV IM/EXPORT ----------
+    function flattenObject(obj, parent = '', res = {}) {
+        for(const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                const propName = parent ? parent + '.' + key : key;
+                if(typeof obj[key] == 'object' && obj[key] !== null && !Array.isArray(obj[key])){
+                    flattenObject(obj[key], propName, res);
+                } else {
+                    res[propName] = obj[key];
+                }
+            }
+        }
+        return res;
+    }
+
+    function setNestedValue(obj, path, value) {
+        const keys = path.split('.');
+        let current = obj;
+        for (let i = 0; i < keys.length - 1; i++) {
+            const key = keys[i];
+            if (!current[key] || typeof current[key] !== 'object') {
+                current[key] = {};
+            }
+            current = current[key];
+        }
+        const finalKey = keys[keys.length - 1];
+
+        // Temporarily navigate to get the original value's type
+        let originalValue;
+        try {
+            originalValue = keys.reduce((o,k)=> o[k] , breakevenData);
+        } catch(e) {
+            originalValue = undefined;
+        }
+
+
+        current[finalKey] = typeof originalValue === 'number' ? numValue(value) : value;
+    }
+
+    function exportDataToCSV() {
+        const flatData = flattenObject(breakevenData);
+        let csvContent = "data:text/csv;charset=utf-8,key,value\n";
+
+        for (const [key, value] of Object.entries(flatData)) {
+            // We don't need to export the labels, they are static
+            if (key.endsWith('.label')) continue;
+            csvContent += `${key},"${String(value).replace(/"/g, '""')}"\n`;
+        }
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "breakeven_data.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function importDataFromCSV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const text = e.target.result;
+            const rows = text.split('\n').slice(1); // Skip header
+            rows.forEach(row => {
+                if (row.trim() === '') return;
+                const [key, ...valueParts] = row.split(',');
+                if (!key) return; // Skip empty keys
+                const value = valueParts.join(',').replace(/^"|"$/g, '').replace(/""/g, '"');
+                setNestedValue(breakevenData, key.trim(), value);
+            });
+
+            // Re-render everything after import
+            renderFixedTables();
+            renderAccordions();
+            setInputValuesFromData();
+            bindInputs(); // Re-bind inputs after re-rendering
+            calculateAll();
+        };
+        reader.readAsText(file);
+    }
+
+    // ---------- INITIALISIERUNG ----------
+    function init() {
+      setupTabs();
+      renderFixedTables();
+      renderAccordions();
+      setInputValuesFromData();
+      bindInputs();
+      calculateAll();
+
+      // Bind CSV buttons
+      $('#export-btn').addEventListener('click', exportDataToCSV);
+      $('#import-btn').addEventListener('click', () => $('#csv-import-input').click());
+      $('#csv-import-input').addEventListener('change', importDataFromCSV);
+
+      window.addEventListener('scroll', handleScroll);
+      window.addEventListener('resize', scaleKpiFonts);
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
