@@ -7,29 +7,40 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;800&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-  </head>
+  <link rel="stylesheet" href="styles.css">
+</head>
 <body>
 
   <div class="sticky-summary">
     <div class="container">
       <div class="kpis">
-        <div class="kpi">
-          <div class="label-and-value">
-            <span class="label">TOTAL COSTS</span>
-            <span class="value" id="sticky-costs">€0,00</span>
+        <div class="kpi" id="sticky-kpi-costs">
+          <h3>TOTAL COSTS</h3>
+          <!-- Desktop values below (hidden on mobile) -->
+          <div class="big">M: <span id="sticky-costs-m-desktop"></span></div>
+          <small>A: <span id="sticky-costs-a-desktop"></span></small>
+          <!-- Mobile values below (hidden on desktop) -->
+          <div class="kpi-values">
+            <span>M: <strong id="sticky-costs-m"></strong></span>
+            <span>A: <span id="sticky-costs-a"></span></span>
           </div>
         </div>
-        <div class="kpi">
-          <div class="label-and-value">
-            <span class="label">TOTAL REVENUE</span>
-            <span class="value" id="sticky-rev">€0,00</span>
+        <div class="kpi" id="sticky-kpi-rev">
+          <h3>TOTAL REVENUE</h3>
+          <div class="big">M: <span id="sticky-rev-m-desktop"></span></div>
+          <small>A: <span id="sticky-rev-a-desktop"></span></small>
+          <div class="kpi-values">
+            <span>M: <strong id="sticky-rev-m"></strong></span>
+            <span>A: <span id="sticky-rev-a"></span></span>
           </div>
         </div>
-        <div class="kpi">
-          <div class="label-and-value">
-            <span class="label">PROFIT/LOSS</span>
-            <span class="value" id="sticky-profit">€0,00</span>
+        <div class="kpi" id="sticky-kpi-profit">
+          <h3>PROFIT/LOSS</h3>
+          <div class="big">M: <span id="sticky-profit-m-desktop"></span></div>
+          <small>A: <span id="sticky-profit-a-desktop"></span></small>
+          <div class="kpi-values">
+            <span>M: <strong id="sticky-profit-m"></strong></span>
+            <span>A: <span id="sticky-profit-a"></span></span>
           </div>
         </div>
       </div>
@@ -68,7 +79,7 @@
         <div class="io-buttons">
             <button class="io-button" id="export-btn">Export CSV</button>
             <button class="io-button" id="import-btn">Import CSV</button>
-            <input type="file" id="csv-import-input" accept=".csv" style="display:none;">
+            <input type="file" id="csv-import-input" accept=".csv">
         </div>
     </div>
 
@@ -76,24 +87,41 @@
       <h2>Personnel Costs</h2>
       <table>
         <thead>
-          <tr>
+          <tr class="desktop-only-row">
             <th>Position</th>
             <th class="num">Monthly Salary</th>
-            <th class="num">High Season</th>
-            <th class="num">Winter Season</th>
+            <th class="num th-desktop-only">High Season</th>
+            <th class="num th-mobile-only">HS</th>
+            <th class="num th-desktop-only">Winter Season</th>
+            <th class="num th-mobile-only">WS</th>
+          </tr>
+          <tr class="mobile-only-row">
+            <th class="num">Monthly Salary</th>
+            <th class="num">HS</th>
+            <th class="num">WS</th>
           </tr>
         </thead>
         <tbody id="staff-body"></tbody>
         <tfoot>
-          <tr>
+          <tr class="desktop-only-row">
             <td colspan="2">Total (monthly)</td>
             <td class="num" id="staff-hs-month">€0,00</td>
             <td class="num" id="staff-ws-month">€0,00</td>
           </tr>
-          <tr>
+          <tr class="desktop-only-row">
             <td colspan="2">Total (annually)</td>
             <td class="num" id="staff-hs-annual">€0,00</td>
             <td class="num" id="staff-ws-annual">€0,00</td>
+          </tr>
+          <tr class="mobile-only-row">
+            <td>Total (monthly)</td>
+            <td class="num" id="staff-hs-month-mobile">€0,00</td>
+            <td class="num" id="staff-ws-month-mobile">€0,00</td>
+          </tr>
+           <tr class="mobile-only-row">
+            <td>Total (annually)</td>
+            <td class="num" id="staff-hs-annual-mobile">€0,00</td>
+            <td class="num" id="staff-ws-annual-mobile">€0,00</td>
           </tr>
         </tfoot>
       </table>
@@ -124,8 +152,10 @@
         <thead>
           <tr>
             <th>Factor</th>
-            <th class="num">High Season</th>
-            <th class="num">Winter Season</th>
+            <th class="num th-desktop-only">High Season</th>
+            <th class="num th-mobile-only">HS</th>
+            <th class="num th-desktop-only">Winter Season</th>
+            <th class="num th-mobile-only">WS</th>
           </tr>
         </thead>
         <tbody>
@@ -179,8 +209,10 @@
         <thead>
           <tr>
             <th>Event</th>
-            <th class="num">High Season</th>
-            <th class="num">Winter Season</th>
+            <th class="num th-desktop-only">High Season</th>
+            <th class="num th-mobile-only">HS</th>
+            <th class="num th-desktop-only">Winter Season</th>
+            <th class="num th-mobile-only">WS</th>
           </tr>
         </thead>
         <tbody id="ticketed-body"></tbody>
@@ -203,8 +235,10 @@
         <thead>
           <tr>
             <th>Event</th>
-            <th class="num">High Season</th>
-            <th class="num">Winter Season</th>
+            <th class="num th-desktop-only">High Season</th>
+            <th class="num th-mobile-only">HS</th>
+            <th class="num th-desktop-only">Winter Season</th>
+            <th class="num th-mobile-only">WS</th>
           </tr>
         </thead>
         <tbody id="fixed-body"></tbody>
@@ -224,7 +258,7 @@
     </div>
   </div>
 
-  
   <script src="script.js"></script>
 </body>
 </html>
+
