@@ -1,0 +1,497 @@
+:root {
+  --bg: #ffffff;
+  --card: #ffffff;
+  --line: #e3e0da;
+  --head: #fafafa;
+  --zebra: #fcfcfc;
+  --muted: #5c5c5c;
+  --text: #000000;
+  --accent: #e86d59;
+  --details-bg: #fafafa;
+  --details-line: #e3e0da;
+  --summary-text: #000000;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 22px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Jost', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-family: 'Jost', sans-serif;
+  font-weight: 800;
+  font-size: 40px;
+  margin: 0.2rem 0;
+}
+
+.subtitle {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--muted);
+  margin: 0 0 24px;
+}
+
+h2 {
+  font-family: 'Jost', sans-serif;
+  font-weight: 800;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 8px;
+  margin-top: 2rem;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  margin-bottom: 22px;
+}
+
+/* KPIs */
+.kpis {
+  display: flex;
+  gap: 14px;
+  flex-wrap: nowrap;
+}
+
+.kpi {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: left;
+  background: #fff;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.kpi h3 {
+  margin: 0;
+  font-weight: 400;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.kpi .big {
+  margin: 6px 0;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kpi small {
+  display: block;
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Tabs & IO Buttons */
+.tabs-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin: 20px 0 14px;
+}
+
+.tabs {
+  display: flex;
+  gap: 20px;
+  border-bottom: 1px solid var(--line);
+  flex-grow: 1;
+}
+
+.tab {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 9px 4px;
+  font-weight: 400;
+  cursor: pointer;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  margin-bottom: -1px;
+}
+
+.tab.active {
+  color: var(--text);
+  font-weight: 800;
+  border-color: var(--accent);
+}
+
+.io-buttons {
+  display: flex;
+  gap: 10px;
+  padding-left: 10px;
+}
+
+.io-button {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  color: var(--muted);
+}
+
+.io-button:hover {
+  background-color: var(--details-bg);
+  color: var(--text);
+}
+
+#csv-import-input {
+  display: none;
+}
+
+.tabpanel {
+  display: none;
+}
+
+.tabpanel[data-active='true'] {
+  display: block;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-top: 1rem;
+}
+
+thead th {
+  background: none;
+  padding: 12px 14px;
+  text-align: left;
+  font-weight: 800;
+  border-bottom: 2px solid var(--text);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+thead th.num {
+  text-align: right;
+}
+
+tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+tbody td.num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+tfoot td {
+  padding: 12px 14px;
+  border-top: 2px solid var(--text);
+  background: none;
+  font-weight: 800;
+}
+
+tfoot td.num {
+  text-align: right;
+}
+
+tbody tr:nth-child(even) td {
+  background: var(--zebra);
+}
+
+.card table {
+  border: none;
+  border-radius: 0;
+}
+
+.th-mobile-only {
+  display: none;
+}
+
+.mobile-only-row {
+  display: none;
+}
+
+.desktop-only-row {
+  display: table-row;
+}
+
+/* Inputs */
+input[type='number'] {
+  width: 100%;
+  max-width: 150px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  text-align: right;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type='number']:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(232, 109, 89, 0.2);
+}
+
+/* Accordions */
+tr.summary {
+  cursor: pointer;
+}
+
+td.caret {
+  position: relative;
+  padding-left: 26px;
+}
+
+td.caret::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  transform: translateY(-50%) rotate(0deg);
+  transition: transform 0.2s ease;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5l2-2 9 9-9 9-2-2 7-7z" fill="%235C5C5C"/></svg>');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+tr.summary[aria-expanded='true'] td.caret::before {
+  transform: translateY(-50%) rotate(90deg);
+}
+
+tr.details > td {
+  padding: 0;
+  border-top: 0;
+}
+
+.details-box {
+  padding: 16px;
+  border-top: 1px dashed var(--details-line);
+  background: var(--details-bg);
+}
+
+.details-box .grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.details-box label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.details-box label input[type='number'] {
+  max-width: none;
+  width: 100%;
+}
+
+/* Sticky Summary - Default Desktop Styles */
+.sticky-summary {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  padding: 10px 22px;
+  border-bottom: 1px solid var(--line);
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: none;
+}
+
+.sticky-summary.visible {
+  display: block;
+}
+
+.sticky-summary .kpi {
+  padding: 8px;
+  background: transparent;
+  border: none;
+  text-align: left;
+}
+
+.sticky-summary .kpi h3 {
+  font-size: 0.7rem;
+}
+
+.sticky-summary .kpi .big {
+  font-size: 1.1rem;
+}
+
+.sticky-summary .kpi small {
+  font-size: 0.8rem;
+}
+
+/* ---------- MOBILE OPTIMIZATIONS ---------- */
+@media (pointer: coarse) and (max-width: 640px) {
+  body {
+    padding: 15px;
+    font-size: 15px;
+  }
+
+  h1 {
+    font-size: 32px;
+    margin-bottom: 15px;
+    line-height: 1.1;
+  }
+
+  .subtitle {
+    margin-bottom: 15px;
+  }
+
+  /* Summary KPIs anpassen (untereinander als Boxen) */
+  #summary-section .kpis {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  #summary-section .kpi {
+    padding: 12px;
+  }
+
+  #summary-section .kpi h3 {
+    margin-bottom: 2px;
+    font-size: 0.7rem;
+  }
+
+  #summary-section .kpi .big {
+    margin: 2px 0;
+  }
+
+  #summary-section .kpi .big,
+  #summary-section .kpi small {
+    font-size: 1.1rem;
+    line-height: 1.2;
+  }
+
+  .card {
+    padding: 12px;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+  }
+
+  /* Tabellen für Mobile anpassen */
+  table {
+    font-size: 0.9rem;
+  }
+
+  thead th,
+  tbody td,
+  tfoot td {
+    padding: 10px 8px;
+  }
+
+  input[type='number'] {
+    max-width: none;
+    font-size: 0.95rem;
+    padding: 6px 8px;
+  }
+
+  .th-desktop-only {
+    display: none;
+  }
+
+  .th-mobile-only {
+    display: table-cell;
+  }
+
+  .mobile-only-row {
+    display: table-row;
+  }
+
+  .desktop-only-row {
+    display: none;
+  }
+
+  .staff-label-row td {
+    font-weight: 400;
+    padding: 10px 8px 0 8px;
+    border-bottom: none;
+  }
+
+  .staff-input-row td {
+    padding-top: 5px;
+  }
+
+  .mobile-only-row th.num {
+    text-align: right;
+  }
+
+  /* Sticky Summary - Mobile Styles */
+  .sticky-summary {
+    padding: 8px 15px;
+  }
+
+  .sticky-summary .kpis {
+    gap: 8px;
+    flex-direction: row;
+    /* Wichtig: nebeneinander */
+  }
+
+  .sticky-summary .kpi {
+    padding: 4px;
+  }
+
+  .sticky-summary .kpi h3,
+  .sticky-summary .kpi .big,
+  .sticky-summary .kpi small {
+    font-size: 0.65rem;
+    /* Einheitliche, kleine Schriftgröße */
+    margin: 0;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .sticky-summary .kpi .big {
+    font-weight: 800;
+  }
+
+  /* Hide mobile grid values, show desktop block values */
+  .sticky-summary .kpi .kpi-values {
+    display: none;
+  }
+}
+
+/* Hide mobile values on desktop */
+@media (pointer: fine) {
+  .sticky-summary .kpi .kpi-values {
+    display: none;
+  }
+}
+
